@@ -1,94 +1,94 @@
-breed [ leaves leaf ]
-breed [ dead-leaves dead-leaf ]
-breed [ raindrops raindrop ]
-breed [ suns sun ]
+breed [ leaves leaf ]  ;; Define la raza "leaves" (hojas)
+breed [ dead-leaves dead-leaf ]  ;; Define la raza "dead-leaves" (hojas muertas)
+breed [ raindrops raindrop ]  ;; Define la raza "raindrops" (gotas de lluvia)
+breed [ suns sun ]  ;; Define la raza "suns" (soles)
 
-leaves-own [
-  water-level
-  sugar-level
-  attachedness
-  chlorophyll
-  carotene
-  anthocyanin
+leaves-own [  ;; Propiedades específicas de las hojas
+  water-level  ;; Nivel de agua de la hoja
+  sugar-level  ;; Nivel de azúcar de la hoja
+  attachedness  ;; Grado de adherencia de la hoja al árbol
+  chlorophyll  ;; Nivel de clorofila de la hoja
+  carotene  ;; Nivel de caroteno de la hoja
+  anthocyanin  ;; Nivel de antocianina de la hoja
 ]
 
-raindrops-own [
-  location
-  amount-of-water
+raindrops-own [  ;; Propiedades específicas de las gotas de lluvia
+  location  ;; Ubicación de la gota de lluvia (cayendo, en raíces, etc.)
+  amount-of-water  ;; Cantidad de agua en la gota de lluvia
 ]
 
-globals [
-  bottom-line
-  evaporation-temp
-  season
+globals [  ;; Variables globales que afectan el comportamiento del sistema
+  bottom-line  ;; Línea inferior del área verde
+  evaporation-temp  ;; Temperatura a la cual ocurre la evaporación
+  season  ;; Estación actual del año
 ]
 
-to setup
-  clear-all
-  set bottom-line min-pycor + 1
-  set evaporation-temp 30
-  set season "autumn"
-  set-default-shape raindrops "circle"
-  set-default-shape suns "circle"
-  set temperature 20
-  set sun-intensity 97
-  ask patches [
-    set pcolor blue - 2
+to setup  ;; Procedimiento de configuración inicial
+  clear-all  ;; Limpia el mundo
+  set bottom-line min-pycor + 1  ;; Establece la línea inferior del área verde
+  set evaporation-temp 30  ;; Establece la temperatura de evaporación
+  set season "autumn"  ;; Establece la estación inicial como otoño
+  set-default-shape raindrops "circle"  ;; Establece la forma por defecto de las gotas de lluvia como círculo
+  set-default-shape suns "circle"  ;; Establece la forma por defecto del sol como círculo
+  set temperature 20  ;; Establece la temperatura inicial
+  set sun-intensity 97  ;; Establece la intensidad inicial del sol
+  ask patches [  ;; Cambia el color de todos los parches
+    set pcolor blue - 2  ;; Establece el color de los parches como azul claro
   ]
-  ask patches with [ pycor < min-pycor + 2 ] [
-    set pcolor green
+  ask patches with [ pycor < min-pycor + 2 ] [  ;; Cambia el color de los parches en la línea inferior
+    set pcolor green  ;; Establece el color de los parches en la línea inferior como verde
   ]
-  create-leaves number-of-leaves [
-    set chlorophyll 50 + random 50
-    set water-level 75 + random 25
-    set sugar-level random-normal start-sugar-mean start-sugar-stddev
-    set carotene random 100
-    change-color
-    set attachedness 100 + random 50
-    fd sqrt random-float 100
+  create-leaves number-of-leaves [  ;; Crea un número de hojas especificado por "number-of-leaves"
+    set chlorophyll 50 + random 50  ;; Asigna un valor aleatorio de clorofila entre 50 y 100
+    set water-level 75 + random 25  ;; Asigna un nivel de agua aleatorio entre 75 y 100
+    set sugar-level random-normal start-sugar-mean start-sugar-stddev  ;; Asigna un nivel de azúcar basado en una distribución normal
+    set carotene random 100  ;; Asigna un valor aleatorio de caroteno
+    change-color  ;; Llama al procedimiento para cambiar el color de la hoja
+    set attachedness 100 + random 50  ;; Asigna un valor aleatorio de adherencia entre 100 y 150
+    fd sqrt random-float 100  ;; Mueve la hoja a una posición aleatoria
   ]
-  ask patches with [
+  ask patches with [  ;; Cambia el color de ciertos parches para representar el tronco del árbol
     pxcor = 0 and pycor <= 5 or
     abs pxcor = (pycor + 2) and pycor < 4 or
     abs pxcor = (pycor + 8) and pycor < 3
   ] [
-    set pcolor brown
+    set pcolor brown  ;; Establece el color de los parches como marrón
   ]
-  create-suns 1 [
-    setxy (max-pxcor - 2) (max-pycor - 3)
-    show-intensity
+  create-suns 1 [  ;; Crea un sol
+    setxy (max-pxcor - 2) (max-pycor - 3)  ;; Coloca el sol en una posición específica
+    show-intensity  ;; Llama al procedimiento para mostrar la intensidad del sol
   ]
-  reset-ticks
+  reset-ticks  ;; Reinicia el contador de ticks
 end
 
-to go
-  if not any? leaves and season = "autumn" [
+to go  ;; Procedimiento principal de ejecución en cada tick
+  if not any? leaves and season = "autumn" [  ;; Si no quedan hojas y es otoño, cambia a invierno
     change-to-winter
   ]
-  if sun-intensity = 9 [stop]
-  make-wind-blow
-  ifelse any? leaves [
-    make-rain-fall
+  if sun-intensity = 9 [stop]  ;; Si la intensidad del sol es 9, detén la simulación
+  make-wind-blow  ;; Llama al procedimiento para simular el viento
+  ifelse any? leaves [  ;; Si hay hojas
+    make-rain-fall  ;; Simula la caída de lluvia
   ] [
-    make-snow-fall
+    make-snow-fall  ;; Simula la caída de nieve
   ]
-  move-water
-  ask suns [ show-intensity ]
-  ask attached-leaves [
+  move-water  ;; Llama al procedimiento para mover el agua
+  ask suns [ show-intensity ]  ;; Muestra la intensidad del sol
+  ask attached-leaves [  ;; Ajusta las propiedades de las hojas adheridas
     adjust-water
     adjust-chlorophyll
     adjust-sugar
     change-color
     change-shape
   ]
-  ask leaves [ fall-if-necessary ]
-  ask leaves with [ ycor <= bottom-line ] [
+  ask leaves [ fall-if-necessary ]  ;; Verifica si las hojas deben caer
+  ask leaves with [ ycor <= bottom-line ] [  ;; Si las hojas están en la línea inferior, se convierten en hojas muertas
     set breed dead-leaves
   ]
-  ask leaves with [ water-level < 1 ] [
+  ask leaves with [ water-level < 1 ] [  ;; Si el nivel de agua es menor a 1, la hoja se desprende
     set attachedness 0
   ]
-  ask leaves [
+  ask leaves [  ;; Ajusta los valores de las propiedades de las hojas
     set chlorophyll (clip chlorophyll)
     set water-level (clip water-level)
     set sugar-level (clip sugar-level)
@@ -96,72 +96,72 @@ to go
     set anthocyanin (clip anthocyanin)
     set attachedness (clip attachedness)
   ]
-  if season = "winter" [
+  if season = "winter" [  ;; Si es invierno, reduce la intensidad del sol
     if sun-intensity >= 10[
       set sun-intensity sun-intensity - 1
     ]
   ]
-  tick
+  tick  ;; Incrementa el contador de ticks
 end
 
-to-report clip [ value ]
+to-report clip [ value ]  ;; Procedimiento para limitar un valor entre 0 y 100
   if value < 0 [ report 0 ]
   if value > 100 [ report 100 ]
   report value
 end
 
-to make-wind-blow
+to make-wind-blow  ;; Procedimiento para simular el viento
   ask leaves [
-    ifelse random 2 = 1
+    ifelse random 2 = 1  ;; Aleatoriamente gira la hoja a la derecha o izquierda
       [ rt 10 * wind-factor ]
       [ lt 10 * wind-factor ]
-    set attachedness attachedness - wind-factor
+    set attachedness attachedness - wind-factor  ;; Reduce la adherencia debido al viento
   ]
 end
 
-to make-rain-fall
-  create-raindrops rain-intensity [
-    setxy random-xcor max-pycor
-    set heading 180
-    fd 0.5 - random-float 1.0
-    set size .3
-    set color gray
-    set location "falling"
-    set amount-of-water 10
+to make-rain-fall  ;; Procedimiento para simular la lluvia
+  create-raindrops rain-intensity [  ;; Crea gotas de lluvia
+    setxy random-xcor max-pycor  ;; Coloca las gotas en posiciones aleatorias en la parte superior
+    set heading 180  ;; Dirige las gotas hacia abajo
+    fd 0.5 - random-float 1.0  ;; Mueve las gotas hacia abajo con una variación aleatoria
+    set size .3  ;; Establece el tamaño de las gotas
+    set color gray  ;; Establece el color de las gotas como gris
+    set location "falling"  ;; Establece la ubicación como "cayendo"
+    set amount-of-water 10  ;; Establece la cantidad de agua en 10
   ]
-  ask raindrops [ fd random-float 2 ]
+  ask raindrops [ fd random-float 2 ]  ;; Mueve las gotas hacia abajo aleatoriamente
 end
 
-to make-snow-fall
-  create-raindrops rain-intensity [
-    setxy random-xcor max-pycor
-    set heading 180
-    fd 0.5 - random-float 1.0
-    set size .3
-    set color white
-    set location "falling"
-    set amount-of-water 10
+to make-snow-fall  ;; Procedimiento para simular la nieve
+  create-raindrops rain-intensity [  ;; Crea "gotas" de nieve
+    setxy random-xcor max-pycor  ;; Coloca las gotas en posiciones aleatorias en la parte superior
+    set heading 180  ;; Dirige las gotas hacia abajo
+    fd 0.5 - random-float 1.0  ;; Mueve las gotas hacia abajo con una variación aleatoria
+    set size .3  ;; Establece el tamaño de las gotas
+    set color white  ;; Establece el color de las gotas como blanco
+    set location "falling"  ;; Establece la ubicación como "cayendo"
+    set amount-of-water 10  ;; Establece la cantidad de agua en 10
   ]
-  ask raindrops [ fd random-float 2 ]
+  ask raindrops [ fd random-float 2 ]  ;; Mueve las gotas hacia abajo aleatoriamente
 end
 
-to move-water
-  ask raindrops with [ location = "falling" and pcolor = green ] [
-    set location "in roots"
-    face patch 0 ycor
+to move-water  ;; Procedimiento para mover el agua desde las gotas a las raíces, tronco y hojas
+  ask raindrops with [ location = "falling" and pcolor = green ] [  ;; Gotas que caen sobre el área verde
+    set location "in roots"  ;; Cambia la ubicación a "en raíces"
+    face patch 0 ycor  ;; Dirige las gotas hacia el tronco
   ]
-  ask raindrops with [ location = "in roots" and pcolor = brown ] [
-    face patch 0 0
-    set location "in trunk"
+  ask raindrops with [ location = "in roots" and pcolor = brown ] [  ;; Gotas en las raíces
+    face patch 0 0  ;; Dirige las gotas hacia el tronco
+    set location "in trunk"  ;; Cambia la ubicación a "en tronco"
   ]
-  ask raindrops with [ location = "in trunk" and patch-here = patch 0 0 ] [
-    set location "in leaves"
-    set heading random 360
+  ask raindrops with [ location = "in trunk" and patch-here = patch 0 0 ] [  ;; Gotas en el tronco
+    set location "in leaves"  ;; Cambia la ubicación a "en hojas"
+    set heading random 360  ;; Dirige las gotas aleatoriamente
   ]
-  ask raindrops with [ location = "in leaves" and amount-of-water <= 0.5 ] [
-    die
+  ask raindrops with [ location = "in leaves" and amount-of-water <= 0.5 ] [  ;; Gotas con poca agua
+    die  ;; Elimina las gotas
   ]
-  ask raindrops with [
+  ask raindrops with [  ;; Elimina gotas que salen del área de las hojas
     (location = "in trunk" or location = "in leaves")
     and (ycor > max [ ycor ] of leaves or
          xcor > max [ xcor ] of leaves or
@@ -171,133 +171,133 @@ to move-water
   ]
 end
 
-to show-intensity
-  set color scale-color yellow sun-intensity 0 150
-  set size sun-intensity / 10
+to show-intensity  ;; Procedimiento para mostrar la intensidad del sol
+  set color scale-color yellow sun-intensity 0 150  ;; Escala el color del sol basado en su intensidad
+  set size sun-intensity / 10  ;; Escala el tamaño del sol basado en su intensidad
   ifelse sun-intensity < 50
-    [ set label-color yellow ]
-    [ set label-color black  ]
+    [ set label-color yellow ]  ;; Si la intensidad es menor a 50, el color de la etiqueta es amarillo
+    [ set label-color black  ]  ;; Si no, el color de la etiqueta es negro
 end
 
-to adjust-water
-  if temperature < 10 [ stop ]
-  let nearby-raindrops raindrops in-radius 2 with [ location = "in leaves" and amount-of-water >= 0 ]
+to adjust-water  ;; Procedimiento para ajustar el nivel de agua de las hojas
+  if temperature < 10 [ stop ]  ;; Si la temperatura es menor a 10, no hacer nada
+  let nearby-raindrops raindrops in-radius 2 with [ location = "in leaves" and amount-of-water >= 0 ]  ;; Encuentra gotas cercanas en las hojas
   if any? nearby-raindrops [
-    let my-raindrop min-one-of nearby-raindrops [ distance myself ]
-    set water-level water-level + ([ amount-of-water ] of my-raindrop * 0.20)
+    let my-raindrop min-one-of nearby-raindrops [ distance myself ]  ;; Encuentra la gota más cercana
+    set water-level water-level + ([ amount-of-water ] of my-raindrop * 0.20)  ;; Incrementa el nivel de agua de la hoja
     ask my-raindrop [
-      set amount-of-water (amount-of-water * 0.80)
+      set amount-of-water (amount-of-water * 0.80)  ;; Reduce el nivel de agua de la gota
     ]
   ]
   if temperature > evaporation-temp [
-    set water-level water-level - (0.5 * (temperature - evaporation-temp))
+    set water-level water-level - (0.5 * (temperature - evaporation-temp))  ;; Reduce el nivel de agua por evaporación
   ]
   if water-level < 25 [
-    set attachedness attachedness - 1
+    set attachedness attachedness - 1  ;; Reduce la adherencia si el nivel de agua es bajo
   ]
 end
 
-to adjust-chlorophyll
+to adjust-chlorophyll  ;; Procedimiento para ajustar el nivel de clorofila de las hojas
   if temperature < 15 [
-    set chlorophyll chlorophyll - (.5 * (15 - temperature))
+    set chlorophyll chlorophyll - (.5 * (15 - temperature))  ;; Reduce la clorofila si la temperatura es baja
   ]
   if sun-intensity > 75 [
-    set chlorophyll chlorophyll - (.5 * (sun-intensity - 75))
+    set chlorophyll chlorophyll - (.5 * (sun-intensity - 75))  ;; Reduce la clorofila si la intensidad del sol es alta
   ]
   if temperature > 15 and sun-intensity > 20 [
-    set chlorophyll chlorophyll + 1
+    set chlorophyll chlorophyll + 1  ;; Incrementa la clorofila si las condiciones son favorables
   ]
 end
 
-to adjust-sugar
+to adjust-sugar  ;; Procedimiento para ajustar el nivel de azúcar de las hojas
   if water-level > 1 and sun-intensity > 20 and chlorophyll > 1 [
-    set water-level water-level - 0.5
-    set chlorophyll chlorophyll - 0.5
-    set sugar-level sugar-level + 1
-    set attachedness attachedness + 5
+    set water-level water-level - 0.5  ;; Reduce el nivel de agua
+    set chlorophyll chlorophyll - 0.5  ;; Reduce el nivel de clorofila
+    set sugar-level sugar-level + 1  ;; Incrementa el nivel de azúcar
+    set attachedness attachedness + 5  ;; Incrementa la adherencia
   ]
-  set sugar-level sugar-level - 0.5
+  set sugar-level sugar-level - 0.5  ;; Reduce el nivel de azúcar
 end
 
-to fall-if-necessary
-  if attachedness > 0 [ stop ]
+to fall-if-necessary  ;; Procedimiento para hacer caer las hojas si es necesario
+  if attachedness > 0 [ stop ]  ;; Si la hoja está adherida, no hacer nada
   if ycor > bottom-line [
-    let target-xcor (xcor + random-float wind-factor - random-float wind-factor)
-    facexy target-xcor bottom-line
-    fd random-float (.7 * max (list wind-factor .5))
+    let target-xcor (xcor + random-float wind-factor - random-float wind-factor)  ;; Calcula una posición objetivo para la hoja
+    facexy target-xcor bottom-line  ;; Dirige la hoja hacia la posición objetivo
+    fd random-float (.7 * max (list wind-factor .5))  ;; Mueve la hoja hacia la posición objetivo
   ]
 end
 
-to change-color
+to change-color  ;; Procedimiento para cambiar el color de las hojas
   if temperature < 20 and sugar-level > 0 and water-level > 0 [
-    set sugar-level sugar-level - 1
-    set water-level water-level - 1
-    set anthocyanin anthocyanin + 1
+    set sugar-level sugar-level - 1  ;; Reduce el nivel de azúcar
+    set water-level water-level - 1  ;; Reduce el nivel de agua
+    set anthocyanin anthocyanin + 1  ;; Incrementa el nivel de antocianina
   ]
   ifelse chlorophyll > 50 [
-    set color scale-color green chlorophyll 150 -50
+    set color scale-color green chlorophyll 150 -50  ;; Cambia el color a verde basado en la clorofila
   ] [
     if abs (anthocyanin - carotene ) < 10 [
-      set color scale-color orange carotene 150 -50
+      set color scale-color orange carotene 150 -50  ;; Cambia el color a naranja basado en el caroteno
     ]
     if anthocyanin > carotene + 10 [
-      set color scale-color red anthocyanin 170 -50
+      set color scale-color red anthocyanin 170 -50  ;; Cambia el color a rojo basado en la antocianina
     ]
     if carotene > anthocyanin + 10 [
-      set color scale-color yellow carotene 150 -50
+      set color scale-color yellow carotene 150 -50  ;; Cambia el color a amarillo basado en el caroteno
     ]
   ]
 end
 
-to change-shape
+to change-shape  ;; Procedimiento para cambiar la forma de las hojas
   ifelse leaf-display-mode = "solid" [
-    set shape "default"
+    set shape "default"  ;; Si el modo de visualización es sólido, usa la forma por defecto
   ] [
     if leaf-display-mode = "chlorophyll" [
-      set-shape-for-value chlorophyll
+      set-shape-for-value chlorophyll  ;; Cambia la forma basada en el nivel de clorofila
     ]
     if leaf-display-mode = "water" [
-      set-shape-for-value water-level
+      set-shape-for-value water-level  ;; Cambia la forma basada en el nivel de agua
     ]
     if leaf-display-mode = "sugar" [
-      set-shape-for-value sugar-level
+      set-shape-for-value sugar-level  ;; Cambia la forma basada en el nivel de azúcar
     ]
     if leaf-display-mode = "carotene" [
-      set-shape-for-value carotene
+      set-shape-for-value carotene  ;; Cambia la forma basada en el nivel de caroteno
     ]
     if leaf-display-mode = "anthocyanin" [
-      set-shape-for-value anthocyanin
+      set-shape-for-value anthocyanin  ;; Cambia la forma basada en el nivel de antocianina
     ]
     if leaf-display-mode = "attachedness" [
-      set-shape-for-value attachedness
+      set-shape-for-value attachedness  ;; Cambia la forma basada en el nivel de adherencia
     ]
   ]
 end
 
-to-report attached-leaves
-  report leaves with [attachedness > 0]
+to-report attached-leaves  ;; Procedimiento para reportar las hojas adheridas
+  report leaves with [attachedness > 0]  ;; Devuelve las hojas que están adheridas
 end
 
-to set-shape-for-value [ value ]
+to set-shape-for-value [ value ]  ;; Procedimiento para cambiar la forma de las hojas basado en un valor
   ifelse value > 75 [
-    set shape "default"
+    set shape "default"  ;; Si el valor es mayor a 75, usa la forma por defecto
   ] [
     ifelse value <= 25 [
-      set shape "default one-quarter"
+      set shape "default one-quarter"  ;; Si el valor es menor o igual a 25, usa la forma de un cuarto
     ] [
       ifelse value <= 50 [
-        set shape "default half"
+        set shape "default half"  ;; Si el valor es menor o igual a 50, usa la forma de la mitad
       ] [
-        set shape "default three-quarter"
+        set shape "default three-quarter"  ;; Si el valor es menor o igual a 75, usa la forma de tres cuartos
       ]
     ]
   ]
 end
 
-to change-to-winter
-  set season "winter"
-  set temperature 0
+to change-to-winter  ;; Procedimiento para cambiar a invierno
+  set season "winter"  ;; Establece la estación como invierno
+  set temperature 0  ;; Establece la temperatura a 0
   ask patches with [ pycor < min-pycor + 2 ] [
-    set pcolor white
+    set pcolor white  ;; Cambia el color de los parches en la línea inferior a blanco
   ]
 end
