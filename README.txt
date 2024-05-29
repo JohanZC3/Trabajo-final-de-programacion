@@ -1,3 +1,12 @@
+Trabajo final de programacion
+
+Integrantes:
+
+Sebastian Barco 
+Natalia Gallego
+Johan Camilo Zuluaga
+
+
 Marco teórico:
 
 Para el presente proyecto se ha elegido el fenómeno natural del cambio de estaciones y como afecta a las plantas. Durante el período que va desde el otoño hasta el invierno, las hojas pasan por varios cambios químicos y fisiológicos que las preparan para la caída y la dormancia. Aquí hay una descripción más detallada del proceso durante este período:
