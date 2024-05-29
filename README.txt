@@ -24,3 +24,6 @@ Caída de la hoja: Una vez que la capa de abscisión está completamente formada
 Durante el invierno, las hojas caídas se descomponen gradualmente en el suelo, liberando nutrientes que pueden ser reciclados por el ecosistema. Mientras tanto, el árbol entra en un estado de dormancia para conservar energía y sobrevivir a las condiciones adversas del invierno, preparándose para volver a crecer en la primavera.
 
 Explicación del desarrollo:
+
+
+La documentación y el código fuente está en el archivo código.
