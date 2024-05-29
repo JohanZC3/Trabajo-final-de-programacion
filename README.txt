@@ -45,8 +45,10 @@ la cual se encargaría de diferenciar en que punto del modelo nos encontramos, y
 en el setup inicial del modelo agregamos una linea de codigo para definir la estacion en otoño, 
 además, agregamos dos lineas de codigo extra que se encargan de darle un valor inicial tanto a la temperatura como a la intensidad del sol, 
 ya que en estas nos basaremos para hacer el cambio a invierno. Los siguientes cambios realizados fueron directamente en la funcion "go",
-en el modelo original, este paraba la simulación en cuanto todas las hojas caian del arbol, modificamos esta sentencia de modo que si, la estacion es otoño y ya no hay hojas en el arbol, en lugar de parar la simulacion, haga un llamado a una nueva funcion que creamos llamada "change-to-winter",
-esta funcion se encarga, como su nombre lo dice, de hacer la transicion entre las estaciones, empezando con una declaracion en la variable global "season" cambiandola a invierno, seguido de colocar la temperatura en 0°C y cambiar el color del suelo a blanco, para simular la acumulacion de nieve. 
+en el modelo original, este paraba la simulación en cuanto todas las hojas caian del arbol, modificamos esta sentencia de modo que si, 
+la estacion es otoño y ya no hay hojas en el arbol, en lugar de parar la simulacion, haga un llamado a una nueva funcion que creamos llamada "change-to-winter",
+esta funcion se encarga, como su nombre lo dice, de hacer la transicion entre las estaciones, 
+empezando con una declaracion en la variable global "season" cambiandola a invierno, seguido de colocar la temperatura en 0°C y cambiar el color del suelo a blanco, para simular la acumulacion de nieve. 
 
 A continuacion, hicimos la modificacion en la funcion "go", de modo que si no hay hojas en el arbol se haga el llamado a la funcion "make-snow-fall", 
 esta funcion es similar a la funcion original del modelo que se encargaba de hacer caer lluvia, solo que cambiamos el color de las gotas a blanco, para que este simule la nieve, pero mantenga las propiedades de caida que tenia la lluvia. 
